@@ -1,4 +1,4 @@
-package com.example.football.Screens
+package com.example.football.Screens.Entier
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -71,7 +71,7 @@ fun Authorization(navHostController: NavHostController){
                 onValueChange = { loginText = it },
                 label = { Text(text = "Login") },
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent, //hide the indicator
+                    focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
             )
@@ -120,3 +120,4 @@ fun Authorization(navHostController: NavHostController){
         }
     }
 }
+

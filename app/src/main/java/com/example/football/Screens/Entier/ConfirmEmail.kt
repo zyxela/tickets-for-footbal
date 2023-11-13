@@ -1,4 +1,4 @@
-package com.example.football.Screens
+package com.example.football.Screens.Entier
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
