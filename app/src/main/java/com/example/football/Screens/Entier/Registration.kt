@@ -139,7 +139,7 @@ fun Registration(navHostController: NavHostController){
                     unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                 )
             )
-            Button(onClick = { navHostController.navigate(Screen.ConfirmEmail.route) }) {
+            Button(onClick = {  }) {
                 Text(
                     text = "Зарегистрироваться",
                     style = TextStyle(fontSize = 16.sp),

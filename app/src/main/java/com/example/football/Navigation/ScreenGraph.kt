@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.football.Screens.Admin.AdminPanel
 import com.example.football.Screens.Entier.Authorization
-import com.example.football.Screens.Entier.ConfirmEmail
+
 import com.example.football.Screens.Entier.MeetingScreen
 import com.example.football.Screens.Entier.Registration
 import com.example.football.Screens.Client.Matches
@@ -15,14 +15,11 @@ import com.example.football.Screens.Client.SearchTicket
 @Composable
 fun ScreenGraph(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.AdminPanel.route) {
+    NavHost(navController = navController, startDestination = Screen.Authorization.route) {
         composable(Screen.Authorization.route){
             Authorization(navHostController = navController)
         }
 
-        composable(Screen.ConfirmEmail.route){
-            ConfirmEmail(navHostController = navController)
-        }
 
         composable(Screen.Registration.route){
             Registration(navHostController = navController)

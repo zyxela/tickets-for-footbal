@@ -72,4 +72,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
+    implementation ("org.postgresql:postgresql:42.2.5")
+
+
 }

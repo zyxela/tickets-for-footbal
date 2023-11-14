@@ -1,5 +1,7 @@
 package com.example.football.Screens.Entier
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +41,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.football.data.DatabaseHandler
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Authorization(navHostController: NavHostController){
+
+    val databaseHandler = DatabaseHandler()
+
+
+
+    var name by remember {
+        mutableStateOf("NAme")
+    }
+
+
+   LaunchedEffect(Unit){
+       val resultSet = databaseHandler.executeQuery("SELECT * FROM stadium")
+       resultSet?.use {
+           while (it.next()) {
+               val nam = it.getString("name")
+               name = nam
+           }
+       }
+   }
+
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +79,7 @@ fun Authorization(navHostController: NavHostController){
     ) {
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = "Sign in",
+                text = name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 40.dp),
