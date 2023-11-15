@@ -15,7 +15,7 @@ import com.example.football.Screens.Client.SearchTicket
 @Composable
 fun ScreenGraph(){
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Authorization.route) {
+    NavHost(navController = navController, startDestination = Screen.AdminPanel.route) {
         composable(Screen.Authorization.route){
             Authorization(navHostController = navController)
         }

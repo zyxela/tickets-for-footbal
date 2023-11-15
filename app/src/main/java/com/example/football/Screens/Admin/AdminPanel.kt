@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import com.example.football.Entities.Match
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.sql.ResultSet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,29 +71,39 @@ fun AdminPanel() {
         }) {
             Text(text = "Добавить стадион")
         }
-
+        var partecipantes by remember {
+            mutableStateOf("")
+        }
+        var stadium by remember {
+            mutableStateOf("")
+        }
+        var date by remember {
+            mutableStateOf("")
+        }
         if (isAddedMatch) {
-            var text by remember {
-                mutableStateOf("")
-            }
+
             Dialog(onDismissRequest = {
                 isAddedMatch = false
             }) {
                 Card {
                     Column(modifier = Modifier.padding(6.dp)) {
                         TextField(
-                            value = text,
-                            onValueChange = { text = it },
+                            value = partecipantes,
+                            onValueChange = { partecipantes = it },
                             label = { Text(text = "Участники") })
                         TextField(
-                            value = text,
-                            onValueChange = { text = it },
+                            value = stadium,
+                            onValueChange = { stadium = it },
                             label = { Text(text = "Стадион") })
                         TextField(
-                            value = text,
-                            onValueChange = { text = it },
+                            value = date,
+                            onValueChange = { date = it },
                             label = { Text(text = "Дата") })
                         Button(onClick = {
+                            GlobalScope.launch {
+                                db.executeQuery("INSERT INTO matches (partecipantes, stadium, date) VALUES ('$partecipantes', '$stadium', '$date');")
+                                isAddedMatch = false
+                            }
 
                         }) {
                             Text(text = "Добавить")
@@ -107,12 +119,24 @@ fun AdminPanel() {
             }) {
                 Card {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        val matches = mutableListOf<Match>()
-                        matches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                        matches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                        matches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                        matches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                        matches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
+                        var matches by remember {
+                            mutableStateOf<MutableList<Match>>(mutableListOf())
+                        }
+
+                        LaunchedEffect(Unit){
+                            var resultSet = db.executeQuery("SELECT * FROM matches;")
+                            var m = mutableListOf<Match>()
+                            resultSet?.use {
+                                while (it.next()) {
+                                    val partecipantes = it.getString("partecipantes")
+                                    val stadium = it.getString("stadium")
+                                    val date = it.getString("date")
+                                    m.add(Match(partecipantes, stadium, date))
+                                }
+                            }
+                            matches = m
+                        }
+
 
 
                         LazyColumn(modifier = Modifier.padding(8.dp)) {
@@ -143,6 +167,9 @@ fun AdminPanel() {
                                                 text = matches[i].date
                                             )
                                             Button(onClick = {
+                                                GlobalScope.launch {
+                                                    db.executeQuery("")
+                                                }
 
                                             }) {
                                                 Text(text = "Убрать")
@@ -168,10 +195,9 @@ fun AdminPanel() {
                     TextField(value = stadiumName, onValueChange ={stadiumName = it} )
                     Button(onClick = {
                         GlobalScope.launch {
-                            db.executeQuery("INSERT INTO stadium name VALUES \n" +
-                                    "    $stadiumName;")
+                            db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")
                         }
-
+                        isAddedStadium = false
                     }) {
                         Text(text = "Добавить")
                     }

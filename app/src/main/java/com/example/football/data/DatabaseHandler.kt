@@ -3,6 +3,7 @@ package com.example.football.data
 import android.util.Log
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -68,5 +69,20 @@ class DatabaseHandler {
 
     }
 
+    suspend fun postQuery(query: String) = runBlocking {
+        val rs = null
+        url = String.format(url, host, port, database)
+        GlobalScope.launch {
+            try{
+                Class.forName("org.postgresql.Driver")
+                connection = DriverManager.getConnection(url, user, pass)
+                val statement = connection?.createStatement()
+            }catch (e:Exception){
+                Log.e("postQuery", e.message.toString())
+            }
+
+        }
+
+    }
 
 }

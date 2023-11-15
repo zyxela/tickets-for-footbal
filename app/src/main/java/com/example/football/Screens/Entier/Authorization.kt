@@ -61,7 +61,7 @@ fun Authorization(navHostController: NavHostController){
 
 
    LaunchedEffect(Unit){
-       val resultSet = databaseHandler.executeQuery("SELECT * FROM stadium")
+       val resultSet = databaseHandler.executeQuery("SELECT * FROM stadium;")
        resultSet?.use {
            while (it.next()) {
                val nam = it.getString("name")
