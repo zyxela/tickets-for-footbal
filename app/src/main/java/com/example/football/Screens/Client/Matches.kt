@@ -21,8 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
+import com.example.football.MyTickets
 import com.example.football.Navigation.Screen
 import com.example.football.Search
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun Matches(navHostController: NavHostController) {
@@ -61,6 +64,7 @@ fun Matches(navHostController: NavHostController) {
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
+                                    GlobalScope.launch { MyTickets.buyTicket(matches[i].id, 27) }
                                     navHostController.navigate(Screen.SearchTicket.route)
                                 }) {
                                 Text(text = "Купить билет")

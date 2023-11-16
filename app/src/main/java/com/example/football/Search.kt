@@ -25,7 +25,7 @@ object Search {
                     matchList.add(match)
                 }
             }
-        }
+        }.join()
 
         return@withContext matchList
     }

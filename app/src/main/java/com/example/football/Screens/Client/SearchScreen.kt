@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
+import com.example.football.Entities.MyTicket
+import com.example.football.Entities.User
+import com.example.football.MyTickets
 import com.example.football.Navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -183,62 +187,36 @@ fun SearchTicket(navHostController: NavHostController) {
         }) {
             Card {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    val activeMatches = mutableListOf<Match>()
-
                     
-                    val inactiveMatches = mutableListOf<Match>()
+                    var matches = listOf<Match>()
 
+                    LaunchedEffect(Unit){
+                        matches = MyTickets.getMyTickets(MyTicket(27,29,27 ))
+                    }
 
                     LazyColumn(modifier = Modifier.padding(8.dp)) {
-                        items(inactiveMatches.count()) { i ->
+                        items(matches.count()) { i ->
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                Card(modifier = Modifier.padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.Red)) {
+                                Card(modifier = Modifier.padding(8.dp)) {
                                     Column(horizontalAlignment = Alignment.Start) {
 
                                         Text(
                                             fontSize = 22.sp,
                                             fontWeight = FontWeight(500),
-                                            text = inactiveMatches[i].participants
+                                            text = matches[i].participants
                                         )
                                         Text(
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight(450),
-                                            text = inactiveMatches[i].stadium
+                                            text = matches[i].stadium
                                         )
                                         Text(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(weight = 400),
-                                            text = inactiveMatches[i].date.toString()
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        items(activeMatches.count()) { i ->
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Card(modifier = Modifier.padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.Green)) {
-                                    Column(horizontalAlignment = Alignment.Start) {
-
-                                        Text(
-                                            fontSize = 22.sp,
-                                            fontWeight = FontWeight(500),
-                                            text = activeMatches[i].participants
-                                        )
-                                        Text(
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight(450),
-                                            text = activeMatches[i].stadium
-                                        )
-                                        Text(
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight(weight = 400),
-                                            text = activeMatches[i].date.toString()
+                                            text = matches[i].date.toString()
                                         )
                                     }
                                 }
