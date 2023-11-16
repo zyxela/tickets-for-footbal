@@ -29,6 +29,7 @@ import com.example.football.Entities.Match
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +146,7 @@ fun AdminPanel() {
                                     val id = it.getString("id").toInt()
                                     val participants = it.getString("participants")
                                     val stadium = it.getString("stadium")
-                                    val date = it.getString("date")
+                                    val date = SimpleDateFormat("yyyy-mm-dd").parse( it.getString("date"))
                                     m.add(Match(id, participants, stadium, date))
                                 }
                             }
@@ -178,7 +179,7 @@ fun AdminPanel() {
                                             Text(
                                                 fontSize = 14.sp,
                                                 fontWeight = FontWeight(weight = 400),
-                                                text = matches[i].date
+                                                text = matches[i].date.toString()
                                             )
                                             Button(
                                                 onClick = {

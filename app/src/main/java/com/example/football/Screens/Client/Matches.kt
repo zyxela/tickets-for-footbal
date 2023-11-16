@@ -22,27 +22,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
 import com.example.football.Navigation.Screen
-import com.example.football.data.DatabaseHandler
+import com.example.football.Search
 
 @Composable
 fun Matches(navHostController: NavHostController) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         var matches by remember {
-            mutableStateOf<MutableList<Match>>(mutableListOf())
+            mutableStateOf<List<Match>>(mutableListOf())
         }
         LaunchedEffect(Unit) {
-            var resultSet = DatabaseHandler().executeQuery("SELECT * FROM matches;")
-            var m = mutableListOf<Match>()
-            resultSet?.use {
-                while (it.next()) {
-                    val id = it.getString("id").toInt()
-                    val participants = it.getString("participants")
-                    val stadium = it.getString("stadium")
-                    val date = it.getString("date")
-                    m.add(Match(id, participants, stadium, date))
-                }
-            }
-            matches = m
+            matches = Search.search()
         }
 
         LazyColumn(modifier = Modifier.padding(8.dp)) {
@@ -67,7 +56,7 @@ fun Matches(navHostController: NavHostController) {
                             Text(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight(400),
-                                text = matches[i].date
+                                text = matches[i].date.toString()
                             )
                             Button(
                                 modifier = Modifier.fillMaxWidth(),

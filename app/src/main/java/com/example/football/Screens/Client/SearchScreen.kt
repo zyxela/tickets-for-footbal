@@ -211,7 +211,7 @@ fun SearchTicket(navHostController: NavHostController) {
                                         Text(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(weight = 400),
-                                            text = inactiveMatches[i].date
+                                            text = inactiveMatches[i].date.toString()
                                         )
                                     }
                                 }
@@ -238,7 +238,7 @@ fun SearchTicket(navHostController: NavHostController) {
                                         Text(
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight(weight = 400),
-                                            text = activeMatches[i].date
+                                            text = activeMatches[i].date.toString()
                                         )
                                     }
                                 }
