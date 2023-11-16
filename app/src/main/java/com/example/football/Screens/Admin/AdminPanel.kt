@@ -29,7 +29,6 @@ import com.example.football.Entities.Match
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.sql.ResultSet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +70,7 @@ fun AdminPanel() {
         }) {
             Text(text = "Добавить стадион")
         }
-        var partecipantes by remember {
+        var participants by remember {
             mutableStateOf("")
         }
         var stadium by remember {
@@ -80,6 +79,17 @@ fun AdminPanel() {
         var date by remember {
             mutableStateOf("")
         }
+
+        var addPermission by remember {
+            mutableStateOf(false)
+        }
+        addPermission = participants != "" && stadium != "" && date != ""
+
+        var addStadiumPermission by remember {
+            mutableStateOf(false)
+        }
+        addStadiumPermission = stadium != ""
+
         if (isAddedMatch) {
 
             Dialog(onDismissRequest = {
@@ -88,8 +98,8 @@ fun AdminPanel() {
                 Card {
                     Column(modifier = Modifier.padding(6.dp)) {
                         TextField(
-                            value = partecipantes,
-                            onValueChange = { partecipantes = it },
+                            value = participants,
+                            onValueChange = { participants = it },
                             label = { Text(text = "Участники") })
                         TextField(
                             value = stadium,
@@ -99,13 +109,17 @@ fun AdminPanel() {
                             value = date,
                             onValueChange = { date = it },
                             label = { Text(text = "Дата") })
-                        Button(onClick = {
+                        Button(
+                            enabled = addPermission,
+                            onClick = {
+
                             GlobalScope.launch {
-                                db.executeQuery("INSERT INTO matches (partecipantes, stadium, date) VALUES ('$partecipantes', '$stadium', '$date');")
+                                db.executeQuery("INSERT INTO matches (participants, stadium, date) VALUES ('$participants', '$stadium', '$date');")
                                 isAddedMatch = false
                             }
 
                         }) {
+
                             Text(text = "Добавить")
                         }
                     }
@@ -123,23 +137,23 @@ fun AdminPanel() {
                             mutableStateOf<MutableList<Match>>(mutableListOf())
                         }
 
-                        LaunchedEffect(Unit){
+                        LaunchedEffect(Unit) {
                             var resultSet = db.executeQuery("SELECT * FROM matches;")
                             var m = mutableListOf<Match>()
                             resultSet?.use {
                                 while (it.next()) {
-                                    val partecipantes = it.getString("partecipantes")
+                                    val id = it.getString("id").toInt()
+                                    val participants = it.getString("participants")
                                     val stadium = it.getString("stadium")
                                     val date = it.getString("date")
-                                    m.add(Match(partecipantes, stadium, date))
+                                    m.add(Match(id, participants, stadium, date))
                                 }
                             }
                             matches = m
                         }
 
-
-
                         LazyColumn(modifier = Modifier.padding(8.dp)) {
+
                             items(matches.count()) { i ->
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,12 +180,13 @@ fun AdminPanel() {
                                                 fontWeight = FontWeight(weight = 400),
                                                 text = matches[i].date
                                             )
-                                            Button(onClick = {
-                                                GlobalScope.launch {
-                                                    db.executeQuery("")
-                                                }
+                                            Button(
+                                                onClick = {
+                                                    GlobalScope.launch {
+                                                        db.executeQuery("DELETE FROM matches WHERE ID = ${matches[i].id};")
+                                                    }
 
-                                            }) {
+                                                }) {
                                                 Text(text = "Убрать")
                                             }
                                         }
@@ -186,14 +201,17 @@ fun AdminPanel() {
         }
 
 
-        if(isAddedStadium){
+        if (isAddedStadium) {
+
             Card {
                 Column {
                     var stadiumName by remember {
                         mutableStateOf("")
-                }
-                    TextField(value = stadiumName, onValueChange ={stadiumName = it} )
-                    Button(onClick = {
+                    }
+                    TextField(value = stadiumName, onValueChange = { stadiumName = it })
+                    Button(
+                        enabled = addStadiumPermission,
+                        onClick = {
                         GlobalScope.launch {
                             db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")
                         }

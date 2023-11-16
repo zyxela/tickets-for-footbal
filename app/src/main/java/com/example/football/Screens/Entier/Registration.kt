@@ -1,5 +1,6 @@
 package com.example.football.Screens.Entier
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,10 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.football.Navigation.Screen
+import com.example.football.Registration.regist
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Registration(navHostController: NavHostController){
+fun Registration(navHostController: NavHostController) {
+    val context = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -104,8 +110,8 @@ fun Registration(navHostController: NavHostController){
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
             var passwordConfirm by rememberSaveable { mutableStateOf("") }
@@ -135,11 +141,34 @@ fun Registration(navHostController: NavHostController){
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
-            Button(onClick = {  }) {
+
+            var enter by remember {
+                mutableStateOf(false)
+            }
+            enter = password == passwordConfirm && password != "" && loginText != ""
+            var regist by remember {
+                mutableStateOf<Boolean?>(null)
+            }
+            if (regist != null) {
+                if (regist!!) {
+                    navHostController.navigate(Screen.SearchTicket.route)
+                }
+                else {
+                    Toast.makeText(context, "Такой пользователь уже есть", Toast.LENGTH_LONG).show()
+                    regist = null
+                }
+
+            }
+
+            Button(
+                enabled = enter,
+                onClick = {
+                    GlobalScope.launch { regist = regist(loginText, password) }
+                }) {
                 Text(
                     text = "Зарегистрироваться",
                     style = TextStyle(fontSize = 16.sp),

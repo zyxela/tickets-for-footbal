@@ -184,17 +184,10 @@ fun SearchTicket(navHostController: NavHostController) {
             Card {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     val activeMatches = mutableListOf<Match>()
-                    activeMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    activeMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    activeMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    activeMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    activeMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
+
                     
                     val inactiveMatches = mutableListOf<Match>()
-                    inactiveMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    inactiveMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    inactiveMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
-                    inactiveMatches.add(Match("Зенит - Манчестер", "Динамо", "12.11.2023"))
+
 
                     LazyColumn(modifier = Modifier.padding(8.dp)) {
                         items(inactiveMatches.count()) { i ->

@@ -2,6 +2,7 @@ package com.example.football.Screens.Entier
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.football.Auth
+import com.example.football.Navigation.Screen
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -50,26 +54,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Authorization(navHostController: NavHostController){
-
-    val databaseHandler = DatabaseHandler()
-
-
-
-    var name by remember {
-        mutableStateOf("NAme")
-    }
-
-
-   LaunchedEffect(Unit){
-       val resultSet = databaseHandler.executeQuery("SELECT * FROM stadium;")
-       resultSet?.use {
-           while (it.next()) {
-               val nam = it.getString("name")
-               name = nam
-           }
-       }
-   }
-
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier
@@ -79,7 +64,7 @@ fun Authorization(navHostController: NavHostController){
     ) {
         Column(verticalArrangement = Arrangement.Center) {
             Text(
-                text = name,
+                text = "Войти",
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 40.dp),
@@ -135,8 +120,17 @@ fun Authorization(navHostController: NavHostController){
                     unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
                 )
             )
+            var enter by remember { mutableStateOf<Boolean?>(null) }
+            if (enter != null){
+                if (enter!!)
+                    navHostController.navigate(Screen.SearchTicket.route)
+                else {
+                    Toast.makeText(context, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
+                    enter = null
+                }
+            }
             Button(onClick = {
-
+                GlobalScope.launch { enter = Auth.checkUser(loginText, password) }
             }) {
                 Text(
                     text = "Войти",

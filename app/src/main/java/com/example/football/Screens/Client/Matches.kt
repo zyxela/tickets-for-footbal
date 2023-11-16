@@ -9,6 +9,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,20 +22,28 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
 import com.example.football.Navigation.Screen
+import com.example.football.data.DatabaseHandler
 
 @Composable
 fun Matches(navHostController: NavHostController) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val matches = mutableListOf<Match>()
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
-        matches.add(Match("Зенит - Манчестер","Динамо","12.11.2023"))
+        var matches by remember {
+            mutableStateOf<MutableList<Match>>(mutableListOf())
+        }
+        LaunchedEffect(Unit) {
+            var resultSet = DatabaseHandler().executeQuery("SELECT * FROM matches;")
+            var m = mutableListOf<Match>()
+            resultSet?.use {
+                while (it.next()) {
+                    val id = it.getString("id").toInt()
+                    val participants = it.getString("participants")
+                    val stadium = it.getString("stadium")
+                    val date = it.getString("date")
+                    m.add(Match(id, participants, stadium, date))
+                }
+            }
+            matches = m
+        }
 
         LazyColumn(modifier = Modifier.padding(8.dp)) {
             items(matches.count()) { i ->
@@ -59,8 +72,8 @@ fun Matches(navHostController: NavHostController) {
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                navHostController.navigate(Screen.SearchTicket.route)
-                            }) {
+                                    navHostController.navigate(Screen.SearchTicket.route)
+                                }) {
                                 Text(text = "Купить билет")
                             }
                         }
