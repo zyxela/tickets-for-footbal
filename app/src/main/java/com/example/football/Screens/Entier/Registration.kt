@@ -155,9 +155,8 @@ fun Registration(navHostController: NavHostController) {
             }
             if (regist != null) {
                 if (regist!!) {
-                    navHostController.navigate(Screen.SearchTicket.route)
-                }
-                else {
+                    navHostController.navigate(Screen.Authorization.route)
+                } else {
                     Toast.makeText(context, "Такой пользователь уже есть", Toast.LENGTH_LONG).show()
                     regist = null
                 }

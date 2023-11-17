@@ -1,7 +1,7 @@
 package com.example.football.Screens.Entier
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,17 +44,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.football.Auth
 import com.example.football.Navigation.Screen
-import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Authorization(navHostController: NavHostController){
+fun Authorization(navHostController: NavHostController) {
     val context = LocalContext.current
-
+    val sp = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -116,21 +113,25 @@ fun Authorization(navHostController: NavHostController){
                     }
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                    unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
             )
             var enter by remember { mutableStateOf<Boolean?>(null) }
-            if (enter != null){
-                if (enter!!)
-                    navHostController.navigate(Screen.SearchTicket.route)
-                else {
+            if (enter != null) {
+                if (enter!!) {
+                    if (sp.getBoolean("USER_STATUS", false)) {
+                        navHostController.navigate(Screen.AdminPanel.route)
+                    } else {
+                        navHostController.navigate(Screen.SearchTicket.route)
+                    }
+                } else {
                     Toast.makeText(context, "Неверный логин или пароль", Toast.LENGTH_LONG).show()
                     enter = null
                 }
             }
             Button(onClick = {
-                GlobalScope.launch { enter = Auth.checkUser(loginText, password) }
+                GlobalScope.launch { enter = Auth.checkUser(loginText, password, context) }
             }) {
                 Text(
                     text = "Войти",

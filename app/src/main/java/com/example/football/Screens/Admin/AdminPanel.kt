@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.football.Entities.Match
+import com.example.football.MaskVisualTransformation
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -109,17 +110,19 @@ fun AdminPanel() {
                         TextField(
                             value = date,
                             onValueChange = { date = it },
-                            label = { Text(text = "Дата") })
+                            label = { Text(text = "Дата") },
+                            visualTransformation = MaskVisualTransformation()
+                        )
                         Button(
                             enabled = addPermission,
                             onClick = {
 
-                            GlobalScope.launch {
-                                db.executeQuery("INSERT INTO matches (participants, stadium, date) VALUES ('$participants', '$stadium', '$date');")
-                                isAddedMatch = false
-                            }
+                                GlobalScope.launch {
+                                    db.executeQuery("INSERT INTO matches (participants, stadium, date) VALUES ('$participants', '$stadium', '$date');")
+                                    isAddedMatch = false
+                                }
 
-                        }) {
+                            }) {
 
                             Text(text = "Добавить")
                         }
@@ -146,7 +149,8 @@ fun AdminPanel() {
                                     val id = it.getString("id").toInt()
                                     val participants = it.getString("participants")
                                     val stadium = it.getString("stadium")
-                                    val date = SimpleDateFormat("yyyy-mm-dd").parse( it.getString("date"))
+                                    val date =
+                                        SimpleDateFormat("yyyy-mm-dd").parse(it.getString("date"))
                                     m.add(Match(id, participants, stadium, date))
                                 }
                             }
@@ -213,11 +217,11 @@ fun AdminPanel() {
                     Button(
                         enabled = addStadiumPermission,
                         onClick = {
-                        GlobalScope.launch {
-                            db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")
-                        }
-                        isAddedStadium = false
-                    }) {
+                            GlobalScope.launch {
+                                db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")
+                            }
+                            isAddedStadium = false
+                        }) {
                         Text(text = "Добавить")
                     }
                 }

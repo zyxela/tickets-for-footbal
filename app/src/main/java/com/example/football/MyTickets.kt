@@ -1,7 +1,6 @@
 package com.example.football
 
 import com.example.football.Entities.Match
-import com.example.football.Entities.MyTicket
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,12 +9,14 @@ import java.text.SimpleDateFormat
 
 object MyTickets {
 
-    suspend fun getMyTickets(usersMatches: MyTicket): List<Match> = withContext(Dispatchers.IO) {
+    suspend fun getMyTickets(usersMatchesId: Int): List<Match> = withContext(Dispatchers.IO) {
         val db = DatabaseHandler()
         val matchesList = mutableListOf<Match>()
+
+
         launch {
             val res =
-                db.executeQuery("SELECT * FROM matches INNER JOIN usersmatches ON matches.id = ${usersMatches.matchId} WHERE usersmatches.user_id = ${usersMatches.userId};")
+                db.executeQuery("SELECT * FROM matches INNER JOIN usersmatches ON matches.id = usersMatches.match_id WHERE usersmatches.user_id = $usersMatchesId;")
             res?.use {
                 while (it.next()) {
                     val match = Match(
@@ -35,7 +36,7 @@ object MyTickets {
         val db = DatabaseHandler()
 
         launch {
-            db.executeQuery("INSERT INTO usersmatches (match_id, user_id) VALUES ($matchId, $userId)")
+            db.executeQuery("INSERT INTO usersmatches (match_id, user_id) VALUES ($matchId, $userId);")
         }.join()
     }
 

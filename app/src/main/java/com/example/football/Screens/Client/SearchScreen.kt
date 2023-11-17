@@ -1,5 +1,6 @@
 package com.example.football.Screens.Client
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -29,18 +29,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
-import com.example.football.Entities.MyTicket
-import com.example.football.Entities.User
+import com.example.football.MaskVisualTransformation
 import com.example.football.MyTickets
-import com.example.football.Navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,6 +46,15 @@ fun SearchTicket(navHostController: NavHostController) {
 
     var isDialogShowed by remember {
         mutableStateOf(false)
+    }
+
+    val context = LocalContext.current
+
+    var stadiums by remember {
+        mutableStateOf(listOf<String>())
+    }
+    LaunchedEffect(Unit) {
+        stadiums = SearchTickets.getStadiums()
     }
 
     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.padding(12.dp)) {
@@ -114,63 +121,62 @@ fun SearchTicket(navHostController: NavHostController) {
                             isExpanded = false
                         }
                     ) {
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = "Динамо")
-                            },
-                            onClick = {
-                                stadium = "Динамо"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = "Минск Арена")
-                            },
-                            onClick = {
-                                stadium = "Минск Арена"
-                                isExpanded = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = "Динамо-Арена")
-                            },
-                            onClick = {
-                                stadium = "Динамо-Арена"
-                                isExpanded = false
-                            }
-                        )
+                        stadiums.forEach { s ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = s)
+                                },
+                                onClick = {
+                                    stadium = s
+                                    isExpanded = false
+                                }
+                            )
+                        }
+
                     }
 
 
                 }
 
-
+                var dateFrom by remember {
+                    mutableStateOf("")
+                }
+                var dateTo by remember {
+                    mutableStateOf("")
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("C")
-                    var dateFrom by remember {
-                        mutableStateOf("")
-                    }
+
                     TextField(
-                        modifier = Modifier.width(90.dp),
+                        modifier = Modifier.width(130.dp),
                         value = dateFrom,
-                        onValueChange = { dateFrom = it })
+                        onValueChange = { dateFrom = it },
+                        visualTransformation = MaskVisualTransformation()
+                    )
 
                     Text("До")
-                    var dateTo by remember {
-                        mutableStateOf("")
-                    }
+
                     TextField(
-                        modifier = Modifier.width(90.dp),
-                        value = dateFrom,
-                        onValueChange = { dateTo = it })
+                        modifier = Modifier.width(130.dp),
+                        value = dateTo,
+                        onValueChange = { dateTo = it },
+                        visualTransformation = MaskVisualTransformation()
+                    )
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RectangleShape,
                     onClick = {
-                        navHostController.navigate(Screen.Matches.route)
+                        navHostController.navigate(
+                            "matches/{stadium}/{dateFrom}/{dateTo}"
+                                .replace("{stadium}", if (stadium != "") stadium else "{stadium}")
+                                .replace(
+                                    "{dateFrom}",
+                                    if (dateFrom != "") dateFrom else "{dateFrom}"
+                                )
+                                .replace("{dateTo}", if (dateTo != "") dateTo else "{dateTo}")
+
+                        )
                     }) {
                     Text("Выбрать матчи")
                 }
@@ -180,6 +186,7 @@ fun SearchTicket(navHostController: NavHostController) {
 
     }
 
+    val sp = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE)
 
     if (isDialogShowed) {
         Dialog(onDismissRequest = {
@@ -187,11 +194,15 @@ fun SearchTicket(navHostController: NavHostController) {
         }) {
             Card {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    
-                    var matches = listOf<Match>()
 
-                    LaunchedEffect(Unit){
-                        matches = MyTickets.getMyTickets(MyTicket(27,29,27 ))
+                    var matches by remember {
+                        mutableStateOf(listOf<Match>())
+                    }
+
+
+                    LaunchedEffect(Unit) {
+                        val userId = sp.getInt("USER_ID", 0)
+                        matches = MyTickets.getMyTickets(userId)
                     }
 
                     LazyColumn(modifier = Modifier.padding(8.dp)) {

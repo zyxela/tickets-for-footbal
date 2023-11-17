@@ -28,13 +28,31 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun Matches(navHostController: NavHostController) {
+fun Matches(
+    navHostController: NavHostController,
+    stadium: String = "",
+    dateFrom: String = "",
+    dateTo: String = "",
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         var matches by remember {
             mutableStateOf<List<Match>>(mutableListOf())
         }
         LaunchedEffect(Unit) {
-            matches = Search.search()
+            matches =
+                if (stadium != "{stadium}" || dateFrom != "{dateFrom}") {
+                    if (stadium != "{stadium}" && dateFrom != "{dateFrom}") {
+                        Search.search(stadium, dateFrom, dateTo)
+                    } else if (stadium != "{stadium}") {
+                        Search.search(stadium)
+                    } else {
+                        Search.search(dateFrom, dateTo)
+                    }
+
+
+                } else
+                    Search.search()
+
         }
 
         LazyColumn(modifier = Modifier.padding(8.dp)) {
