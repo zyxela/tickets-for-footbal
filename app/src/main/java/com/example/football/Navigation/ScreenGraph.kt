@@ -16,11 +16,10 @@ import com.example.football.Screens.Entier.Registration
 @Composable
 fun ScreenGraph() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Screen.Authorization.route) {
+    NavHost(navController = navController, startDestination = Screen.Meeting.route) {
         composable(Screen.Authorization.route) {
             Authorization(navHostController = navController)
         }
-
 
         composable(Screen.Registration.route) {
             Registration(navHostController = navController)

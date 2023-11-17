@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,8 +30,8 @@ fun MeetingScreen(navHostController: NavHostController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedButton(
-                modifier = Modifier.width(175.dp),
+            Button(
+                modifier = Modifier.width(220.dp),
                 onClick = {
                     navHostController.navigate(Screen.Authorization.route)
                 }
@@ -39,7 +40,7 @@ fun MeetingScreen(navHostController: NavHostController) {
             }
 
             OutlinedButton(
-                modifier = Modifier.width(175.dp),
+                modifier = Modifier.width(220.dp),
                 onClick = {
                     navHostController.navigate(Screen.Registration.route)
                 }

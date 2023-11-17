@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -22,11 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.football.Entities.Match
 import com.example.football.MaskVisualTransformation
+import com.example.football.Screens.Client.SearchTickets
 import com.example.football.data.DatabaseHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,6 +51,13 @@ fun AdminPanel() {
     }
     var isAddedStadium by remember {
         mutableStateOf(false)
+    }
+
+    var stadiums by remember {
+        mutableStateOf(listOf<String>())
+    }
+    LaunchedEffect(Unit) {
+        stadiums = SearchTickets.getStadiums()
     }
 
     Column(
@@ -93,7 +106,13 @@ fun AdminPanel() {
         addStadiumPermission = stadium != ""
 
         if (isAddedMatch) {
+            var isExpanded by remember {
+                mutableStateOf(false)
+            }
 
+            var stadium by remember {
+                mutableStateOf("")
+            }
             Dialog(onDismissRequest = {
                 isAddedMatch = false
             }) {
@@ -103,20 +122,57 @@ fun AdminPanel() {
                             value = participants,
                             onValueChange = { participants = it },
                             label = { Text(text = "Участники") })
-                        TextField(
-                            value = stadium,
-                            onValueChange = { stadium = it },
-                            label = { Text(text = "Стадион") })
+                        ExposedDropdownMenuBox(
+                            expanded = isExpanded,
+                            onExpandedChange = { isExpanded = it }) {
+
+                            TextField(
+                                value = stadium,
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+                                },
+                                placeholder = {
+                                    Text(text = "Выберите стадион")
+                                },
+                                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                                modifier = Modifier.menuAnchor()
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = isExpanded,
+                                onDismissRequest = {
+                                    isExpanded = false
+                                }
+                            ) {
+                                stadiums.forEach { s ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(text = s)
+                                        },
+                                        onClick = {
+                                            stadium = s
+                                            isExpanded = false
+                                        }
+                                    )
+                                }
+
+                            }
+
+
+                        }
                         TextField(
                             value = date,
                             onValueChange = { date = it },
                             label = { Text(text = "Дата") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             visualTransformation = MaskVisualTransformation()
                         )
                         Button(
                             enabled = addPermission,
                             onClick = {
-
+                                date = SearchTickets.formatString(date)
                                 GlobalScope.launch {
                                     db.executeQuery("INSERT INTO matches (participants, stadium, date) VALUES ('$participants', '$stadium', '$date');")
                                     isAddedMatch = false

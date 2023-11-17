@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material3.Button
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -151,6 +153,7 @@ fun SearchTicket(navHostController: NavHostController) {
                         modifier = Modifier.width(130.dp),
                         value = dateFrom,
                         onValueChange = { dateFrom = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         visualTransformation = MaskVisualTransformation()
                     )
 
@@ -160,6 +163,7 @@ fun SearchTicket(navHostController: NavHostController) {
                         modifier = Modifier.width(130.dp),
                         value = dateTo,
                         onValueChange = { dateTo = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         visualTransformation = MaskVisualTransformation()
                     )
                 }
@@ -167,6 +171,8 @@ fun SearchTicket(navHostController: NavHostController) {
                     modifier = Modifier.fillMaxWidth(),
                     shape = RectangleShape,
                     onClick = {
+                        dateFrom = SearchTickets.formatString(dateFrom)
+                        dateTo = SearchTickets.formatString(dateTo)
                         navHostController.navigate(
                             "matches/{stadium}/{dateFrom}/{dateTo}"
                                 .replace("{stadium}", if (stadium != "") stadium else "{stadium}")

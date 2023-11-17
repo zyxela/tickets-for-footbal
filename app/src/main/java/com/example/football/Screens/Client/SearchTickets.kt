@@ -21,4 +21,9 @@ object SearchTickets {
 
         return@withContext stadiums
     }
+
+    fun formatString(input: String): String {
+        val regex = """(\d{2})(\d{2})(\d{4})""".toRegex()
+        return regex.replace(input, "$1-$2-$3")
+    }
 }
