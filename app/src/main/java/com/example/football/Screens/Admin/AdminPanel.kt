@@ -95,10 +95,7 @@ fun AdminPanel() {
             mutableStateOf("")
         }
 
-        var addPermission by remember {
-            mutableStateOf(false)
-        }
-        addPermission = participants != "" && stadium != "" && date != ""
+
 
         var addStadiumPermission by remember {
             mutableStateOf(false)
@@ -170,7 +167,7 @@ fun AdminPanel() {
                             visualTransformation = MaskVisualTransformation()
                         )
                         Button(
-                            enabled = addPermission,
+                            enabled = participants != "" && stadium != "" && date != "",
                             onClick = {
                                 date = SearchTickets.formatString(date)
                                 GlobalScope.launch {
@@ -271,7 +268,7 @@ fun AdminPanel() {
                     }
                     TextField(value = stadiumName, onValueChange = { stadiumName = it })
                     Button(
-                        enabled = addStadiumPermission,
+                     //   enabled = addStadiumPermission,
                         onClick = {
                             GlobalScope.launch {
                                 db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")

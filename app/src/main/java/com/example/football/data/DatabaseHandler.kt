@@ -12,7 +12,7 @@ class DatabaseHandler {
 
     private var connection: Connection? = null
 
-    private val host = "10.0.2.2"
+    private val host = "192.168.137.1"
 
     private val database = "test"
     private val port = 5432

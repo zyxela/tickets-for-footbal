@@ -146,15 +146,11 @@ fun Registration(navHostController: NavHostController) {
                 )
             )
 
-            var enter by remember {
-                mutableStateOf(false)
-            }
-            enter = password == passwordConfirm && password != "" && loginText != ""
             var regist by remember {
                 mutableStateOf<Boolean?>(null)
             }
             if (regist != null) {
-                if (regist!!) {
+                if (!regist!!) {
                     navHostController.navigate(Screen.Authorization.route)
                 } else {
                     Toast.makeText(context, "Такой пользователь уже есть", Toast.LENGTH_LONG).show()
@@ -164,7 +160,7 @@ fun Registration(navHostController: NavHostController) {
             }
 
             Button(
-                enabled = enter,
+                enabled = password == passwordConfirm && password != "" && loginText != "",
                 onClick = {
                     GlobalScope.launch { regist = regist(loginText, password) }
                 }) {

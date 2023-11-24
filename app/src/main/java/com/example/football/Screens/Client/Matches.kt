@@ -1,5 +1,6 @@
 package com.example.football.Screens.Client
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +36,11 @@ fun Matches(
     dateFrom: String = "",
     dateTo: String = "",
 ) {
+
+    val context = LocalContext.current
+    val userId = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE).getInt("USER_ID", 0)
+
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         var matches by remember {
             mutableStateOf<List<Match>>(mutableListOf())
@@ -82,7 +89,7 @@ fun Matches(
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    GlobalScope.launch { MyTickets.buyTicket(matches[i].id, 27) }
+                                    GlobalScope.launch { MyTickets.buyTicket(matches[i].id, userId) }
                                     navHostController.navigate(Screen.SearchTicket.route)
                                 }) {
                                 Text(text = "Купить билет")
