@@ -85,6 +85,19 @@ fun AdminPanel() {
         }) {
             Text(text = "Добавить стадион")
         }
+
+        var edit by remember {
+            mutableStateOf(false)
+        }
+        Button(modifier = Modifier.width(300.dp), shape = RectangleShape, onClick = {
+            edit = true
+        }) {
+            Text(text = "Редактировать матчи")
+        }
+        if (edit)
+            EditMatches(edit)
+
+
         var participants by remember {
             mutableStateOf("")
         }
@@ -94,7 +107,6 @@ fun AdminPanel() {
         var date by remember {
             mutableStateOf("")
         }
-
 
 
         var addStadiumPermission by remember {
@@ -268,7 +280,7 @@ fun AdminPanel() {
                     }
                     TextField(value = stadiumName, onValueChange = { stadiumName = it })
                     Button(
-                     //   enabled = addStadiumPermission,
+                        //   enabled = addStadiumPermission,
                         onClick = {
                             GlobalScope.launch {
                                 db.executeQuery("INSERT INTO stadium (name) VALUES ('$stadiumName');")
@@ -276,6 +288,151 @@ fun AdminPanel() {
                             isAddedStadium = false
                         }) {
                         Text(text = "Добавить")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditMatches(_isEdit: Boolean = true) {
+
+    var isEdit by remember {
+        mutableStateOf(_isEdit)
+    }
+
+    var isExpanded by remember {
+        mutableStateOf(false)
+    }
+    val db = DatabaseHandler()
+    if (isEdit) {
+        Dialog(onDismissRequest = {
+            isEdit = false
+        }) {
+            Card {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    var matches by remember {
+                        mutableStateOf<MutableList<Match>>(mutableListOf())
+                    }
+                    var stadiums by remember {
+                        mutableStateOf<MutableList<String>>(mutableListOf())
+                    }
+
+                    LaunchedEffect(Unit) {
+                        var resultSet = db.executeQuery("SELECT * FROM matches;")
+                        var m = mutableListOf<Match>()
+                        resultSet?.use {
+                            while (it.next()) {
+                                val id = it.getString("id").toInt()
+                                val participants = it.getString("participants")
+                                val stadium = it.getString("stadium")
+                                val date =
+                                    SimpleDateFormat("yyyy-mm-dd").parse(it.getString("date"))
+                                m.add(Match(id, participants, stadium, date))
+                            }
+                        }
+                        matches = m
+
+                        var rs = db.executeQuery("SELECT * FROM stadium;")
+                        var s = mutableListOf<String>()
+                        rs?.use {
+                            while (it.next()) {
+                                val stadium = it.getString("name")
+                                s.add(stadium)
+                            }
+                        }
+                        stadiums = s
+                    }
+
+                    LazyColumn(modifier = Modifier.padding(8.dp)) {
+
+                        items(matches.count()) { i ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Card(
+                                    modifier = Modifier.padding(8.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                                ) {
+                                    Column(horizontalAlignment = Alignment.Start) {
+
+                                        var p by remember {
+                                            mutableStateOf(matches[i].participants)
+                                        }
+                                        TextField(
+                                            placeholder = {
+                                                Text(text = "Команды")
+                                            },
+                                            value = p,
+                                            onValueChange = {
+                                                p = it
+                                            })
+
+                                        var stadium by remember {
+                                            mutableStateOf(matches[i].stadium)
+                                        }
+                                        ExposedDropdownMenuBox(
+                                            expanded = isExpanded,
+                                            onExpandedChange = { isExpanded = it }) {
+
+                                            TextField(
+                                                value = stadium,
+                                                onValueChange = {},
+                                                readOnly = true,
+                                                trailingIcon = {
+                                                    ExposedDropdownMenuDefaults.TrailingIcon(
+                                                        expanded = isExpanded
+                                                    )
+                                                },
+                                                placeholder = {
+                                                    Text(text = "Выберите стадион")
+                                                },
+                                                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                                                modifier = Modifier.menuAnchor()
+                                            )
+
+                                            ExposedDropdownMenu(
+                                                expanded = isExpanded,
+                                                onDismissRequest = {
+                                                    isExpanded = false
+                                                }
+                                            ) {
+                                                stadiums.forEach { s ->
+                                                    DropdownMenuItem(
+                                                        text = {
+                                                            Text(text = s)
+                                                        },
+                                                        onClick = {
+                                                            stadium = s
+                                                            isExpanded = false
+                                                        }
+                                                    )
+                                                }
+
+                                            }
+
+
+                                        }
+
+
+                                        Button(
+                                            onClick = {
+                                                GlobalScope.launch {
+
+                                                    db.executeQuery("UPDATE matches SET participants = '$p', stadium = '$stadium'  WHERE id = ${matches[i].id};")
+                                                }
+
+                                            }) {
+                                            Text(text = "Пименить")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }

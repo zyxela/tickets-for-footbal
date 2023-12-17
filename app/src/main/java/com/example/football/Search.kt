@@ -51,6 +51,27 @@ object Search {
         return@withContext matchList
     }
 
+
+    suspend fun searchWithName(p: String): List<Match> = withContext(Dispatchers.IO) {
+        val matchList = mutableListOf<Match>()
+        val db = DatabaseHandler()
+        launch {
+            val res = db.executeQuery("SELECT * FROM matches WHERE participants = '$p';")
+            res?.use {
+                while (it.next()) {
+                    val match = Match(
+                        it.getString("id").toInt(),
+                        it.getString("participants"),
+                        it.getString("stadium"),
+                        SimpleDateFormat("yyyy-mm-dd").parse(it.getString("date")),
+                    )
+                    matchList.add(match)
+                }
+            }
+        }
+
+        return@withContext matchList
+    }
     suspend fun search(dateFrom: String, dateTo: String): List<Match> =
         withContext(Dispatchers.IO) {
             val matchList = mutableListOf<Match>()

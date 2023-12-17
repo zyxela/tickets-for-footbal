@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.example.football.Entities.Match
 import com.example.football.MyTickets
 import com.example.football.Navigation.Screen
+import com.example.football.SavePDF
 import com.example.football.Search
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,10 +36,12 @@ fun Matches(
     stadium: String = "",
     dateFrom: String = "",
     dateTo: String = "",
+    p: String = "",
 ) {
 
     val context = LocalContext.current
-    val userId = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE).getInt("USER_ID", 0)
+    val userId =
+        context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE).getInt("USER_ID", 0)
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -47,7 +50,9 @@ fun Matches(
         }
         LaunchedEffect(Unit) {
             matches =
-                if (stadium != "{stadium}" || dateFrom != "{dateFrom}") {
+                if (p != "{p}") {
+                    Search.searchWithName(p)
+                } else if (stadium != "{stadium}" || dateFrom != "{dateFrom}") {
                     if (stadium != "{stadium}" && dateFrom != "{dateFrom}") {
                         Search.search(stadium, dateFrom, dateTo)
                     } else if (stadium != "{stadium}") {
@@ -89,7 +94,16 @@ fun Matches(
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {
-                                    GlobalScope.launch { MyTickets.buyTicket(matches[i].id, userId) }
+                                    GlobalScope.launch {
+                                        MyTickets.buyTicket(
+                                            matches[i].id,
+                                            userId
+                                        )
+                                    }
+                                    SavePDF.saveToPDF(
+                                        "<html><body>${matches[i].id}<br>${matches[i].participants}<br>${matches[i].stadium}<br>${matches[i].date}<br></body></html>",
+                                        "${context.getExternalFilesDir("")}/ticket${matches[i].id}$userId.pdf"
+                                    )
                                     navHostController.navigate(Screen.SearchTicket.route)
                                 }) {
                                 Text(text = "Купить билет")

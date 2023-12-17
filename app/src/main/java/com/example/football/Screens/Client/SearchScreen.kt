@@ -90,7 +90,13 @@ fun SearchTicket(navHostController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                var p by remember {
+                    mutableStateOf("")
+                }
 
+                TextField(value = p, onValueChange = { p = it }, placeholder = {
+                    Text(text = "Участники")
+                })
 
                 var isExpanded by remember {
                     mutableStateOf(false)
@@ -174,13 +180,14 @@ fun SearchTicket(navHostController: NavHostController) {
                         dateFrom = SearchTickets.formatString(dateFrom)
                         dateTo = SearchTickets.formatString(dateTo)
                         navHostController.navigate(
-                            "matches/{stadium}/{dateFrom}/{dateTo}"
+                            "matches/{stadium}/{dateFrom}/{dateTo}/{p}"
                                 .replace("{stadium}", if (stadium != "") stadium else "{stadium}")
                                 .replace(
                                     "{dateFrom}",
                                     if (dateFrom != "") dateFrom else "{dateFrom}"
                                 )
                                 .replace("{dateTo}", if (dateTo != "") dateTo else "{dateTo}")
+                                .replace("{p}", if (p != "") p else "{p}")
 
                         )
                     }) {

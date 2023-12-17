@@ -74,5 +74,8 @@ dependencies {
 
     implementation ("org.postgresql:postgresql:42.2.5")
 
+    implementation ("com.itextpdf:itext7-core:7.1.15")
+    implementation ("com.itextpdf:html2pdf:3.0.5")
+
 
 }

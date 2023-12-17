@@ -33,8 +33,12 @@ fun ScreenGraph() {
             SearchTicket(navHostController = navController)
         }
         composable(
-            "matches/{stadium}/{dateFrom}/{dateTo}",
+            "matches/{stadium}/{dateFrom}/{dateTo}/{p}",
             arguments = listOf(
+                navArgument("p") {
+                    defaultValue = ""
+                    type = NavType.StringType
+                },
                 navArgument("stadium") {
                     defaultValue = ""
                     type = NavType.StringType
@@ -49,11 +53,12 @@ fun ScreenGraph() {
                 }
             )
         ) { bse ->
+            val p = bse.arguments?.getString("p")!!
             val s = bse.arguments?.getString("stadium")!!
             val df = bse.arguments?.getString("dateFrom")!!
             val dt = bse.arguments?.getString("dateTo")!!
             Matches(
-                navHostController = navController, s, df, dt
+                navHostController = navController, s, df, dt, p
             )
 
         }
